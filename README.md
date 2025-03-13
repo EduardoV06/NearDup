@@ -89,7 +89,7 @@ Perceive's CLI automatically determines the comparison mode:
 Additional options such as model selection (`-m`), YAML configuration (`-yp`), similarity metric (`-sm`), and output formatting (`-o` and `-of`) are available for fine-tuning.
 
 ## Configuration (YAML Schema)
-NearDup uses a YAML configuration file to manage model selection and paths. This allows you to define models, specify weights, and set a `base_path` to simplify file references.
+Perceive uses a YAML configuration file to manage model selection and paths. This allows you to define models, specify weights, and set a `base_path` to simplify file references.
 
 ```yaml
 base_path: "/Users/yourname/dataset"  # Optional: define a root directory for images
