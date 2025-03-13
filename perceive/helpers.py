@@ -3,6 +3,10 @@ import torch
 from torch.utils.data import Dataset
 from pathlib import Path
 from os import listdir
+from functools import lru_cache
+from dataclasses import dataclass
+from typing import Dict, Union
+
 
 # def extract_features_torchvision(model, image_tensor):
 #     """Extract features from torchvision models (e.g., ResNet, EfficientNet)."""
@@ -39,21 +43,40 @@ def compute_hf_embedding(model_fn, processor, image):
         outputs = model_fn(**inputs)
     return outputs.last_hidden_state.mean(dim=1)
 
-
+@lru_cache(maxsize=500)
 def compute_embedding(model, image_tensor):
-    """Compute embeddings using the provided model.
-       For Hugging Face models, image_tensor is expected to be a PIL image.
-    """
+    """Compute embeddings using the provided model."""
     with torch.inference_mode():
+        model.eval()
+        
+        # Modelos Vision Transformer ou Swin (transformers do Torch)
         if hasattr(model, 'forward_features'):
-            model.eval()
             return model.forward_features(image_tensor)
-        elif isinstance(model, tuple):  # Hugging Face model (model, processor)
+        
+        # Modelos do Hugging Face
+        elif isinstance(model, tuple):  # (modelo, processor)
             model_, processor = model
             return compute_hf_embedding(model_, processor, image_tensor)
+
+        # Modelos padrão do TorchVision
+        elif hasattr(model, 'global_pool'):  # EfficientNet, MobileNet, etc.
+            x = model.features(image_tensor)
+            return model.global_pool(x)
+
+        elif hasattr(model, 'avgpool'):  # ResNet, DenseNet, etc.
+            x = model.conv1(image_tensor)
+            x = model.bn1(x)
+            x = model.relu(x)
+            x = model.maxpool(x)
+            x = model.layer1(x)
+            x = model.layer2(x)
+            x = model.layer3(x)
+            x = model.layer4(x)
+            x = model.avgpool(x)
+            return torch.flatten(x, 1)  # Flatten para vetor de embedding
+
         else:
-            model.eval()
-            return model(image_tensor).squeeze(-1).squeeze(-1)
+            raise ValueError("Modelo não reconhecido para extração de embeddings!")
 
 class ImageFolderDataset(Dataset):
     """Custom Dataset for loading images from a folder."""
@@ -69,3 +92,22 @@ class ImageFolderDataset(Dataset):
         image = self.preprocess_fn(image_path)
         return image
     
+@dataclass
+class Model:
+    source: str
+    function: str
+    weights: Union[str, None] = None
+    repo: Union[str, None] = None
+
+    def __post_init__(self):
+        if self.source.lower() not in ["torchvision", "torchhub", "huggingface"]:
+            raise TypeError("Model's source must be from either torchvision, torchhub or huggingface")
+
+@dataclass
+class Yaml_Schema:
+    __slots__ = ['base_path', 'models']
+    base_path: Union[str, Path]
+    models: Dict[str, Model]
+    def __post_init__(self):
+        if not isinstance(self.base_path, (str, Path)):
+            raise ValueError(f"base_path must be a string or a Path, got {type(self.base_path)}")

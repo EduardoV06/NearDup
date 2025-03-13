@@ -1,6 +1,6 @@
 # core.py
 from .models import load_model
-from .preprocess import load_and_preprocess_image
+from .preprocess import load_and_preprocess_image, process_image_safely
 import torch
 import torch.nn.functional as F
 from pathlib import Path
@@ -17,7 +17,7 @@ def compute_similarity_imgs(model_name, img1_path, img2_path, similarity_metric=
     """Compute similarity between two images using a selected model."""
 
     cfg = load_models_from_yaml(yaml_path)
-    model_obj = cfg["models"].get(model_name)
+    model_obj = cfg.models.get(model_name)
     if model_obj is None:
         raise ValueError(f"Unknown model: {model_name}")
 
@@ -29,8 +29,8 @@ def compute_similarity_imgs(model_name, img1_path, img2_path, similarity_metric=
         processor = model[1]
 
         # Open images
-        img1 = Image.open(img1_path)
-        img2 = Image.open(img2_path)
+        img1 = process_image_safely(img1_path)
+        img2 = process_image_safely(img2_path)
 
         # Compute embeddings using the helper function
         embedding1 = compute_hf_embedding(model_fn, processor, img1)
@@ -63,7 +63,7 @@ def compute_similarity_img_folder(model_name, img_path, folder_path, similarity_
     """
     # Load model configuration and model
     cfg = load_models_from_yaml(yaml_path)
-    model_obj = cfg["models"].get(model_name)
+    model_obj = cfg.models.get(model_name)
     if model_obj is None:
         raise ValueError(f"Unknown model: {model_name}")
     model = load_model(model_obj)
@@ -72,7 +72,7 @@ def compute_similarity_img_folder(model_name, img_path, folder_path, similarity_
     if isinstance(model, tuple):
         # Hugging Face style: model is (model_fn, processor)
         model_fn, processor = model
-        target_img = Image.open(img_path)
+        target_img = process_image_safely(img_path)
 
         target_embedding = compute_hf_embedding(model_fn, processor, target_img)  # shape: (1, hidden_dim)
     else:
@@ -88,7 +88,7 @@ def compute_similarity_img_folder(model_name, img_path, folder_path, similarity_
         folder_paths = [str(Path(folder_path) / f) for f in listdir(folder_path) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
         embeddings_list = []
         for img_file in folder_paths:
-            img = Image.open(img_file)
+            img = process_image_safely(img_file)
 
             embedding = compute_hf_embedding(model_fn, processor, img)
             embeddings_list.append(embedding)
@@ -118,7 +118,7 @@ def compute_similarity_two_folders(model_name, folder1_path, folder2_path, simil
     """
     # Load model configuration and model
     cfg = load_models_from_yaml(yaml_path)
-    model_obj = cfg["models"].get(model_name)
+    model_obj = cfg.models.get(model_name)
     if model_obj is None:
         raise ValueError(f"Unknown model: {model_name}")
     model = load_model(model_obj)
@@ -131,7 +131,7 @@ def compute_similarity_two_folders(model_name, folder1_path, folder2_path, simil
             img_paths = [str(Path(folder_path) / f) for f in listdir(folder_path)]
             embeddings_list = []
             for img_file in img_paths:
-                img = Image.open(img_file)
+                img = process_image_safely(img_file)
                 embedding = compute_hf_embedding(model_fn, processor, img)
                 embeddings_list.append(embedding)
             return torch.cat(embeddings_list, dim=0)

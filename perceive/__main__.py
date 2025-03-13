@@ -3,12 +3,14 @@
 import argparse
 import os
 
-from neardup.models import  load_models_from_yaml, load_model
-from neardup.core import (
+from perceive.models import  load_models_from_yaml, load_model
+from perceive.core import (
     compute_similarity_imgs,
     compute_similarity_img_folder,
     compute_similarity_two_folders
 )
+import warnings
+warnings.filterwarnings("ignore")
 
 def main():
     parser = argparse.ArgumentParser(description="NearDup: Image Similarity Comparison Tool")
@@ -61,7 +63,7 @@ def main():
 
     # Load the configuration from the YAML file
     cfg = load_models_from_yaml(args.yaml_path)
-    model_obj = cfg["models"].get(args.model)
+    model_obj = cfg.models.get(args.model)
     if model_obj is None:
         raise ValueError(f"Model {args.model} not found in the YAML config.")
 
@@ -69,7 +71,7 @@ def main():
     model = load_model(model_obj)
 
     # Define base path for relative file paths in YAML config
-    base_path = cfg.get("base_path", "")
+    base_path = cfg.base_path
 
     # Check if comparing two images or two folders
     if args.files and not args.directory:

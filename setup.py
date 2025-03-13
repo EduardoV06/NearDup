@@ -4,16 +4,16 @@ with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
 setup(
-    name="neardup",
+    name="perceive",
     author="EduardoV06",
     author_email="evodopoives@protonmail.com",
     description="A CLI tool for image similarity detection.",
     version="0.0.1",
     license="MIT",
-    packages=find_packages(include=["neardup", "neardup.*"]),
+    packages=find_packages(include=["perceive", "perceive.*"]),
     entry_points={
         "console_scripts": [
-            "neardup = neardup.__main__:main"
+            "perceive = perceive.__main__:main"
         ]
     },
     python_requires=">=3.11",

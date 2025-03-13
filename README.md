@@ -1,40 +1,39 @@
-# NearDup: A CLI Tool and Python Library for Image Similarity Comparison
+# Perceive: A CLI Tool and Python Library for Image Similarity Comparison
 
 ## Overview
-NearDup is a lightweight, customizable tool for comparing image similarity. It is designed to be used both as a command-line interface (CLI) and as a Python library. With support for multiple backbone models (via Torchvision, Hugging Face, or TorchHub), advanced visualization (e.g., Grad-CAM, Grad-CAM++), and a YAML-driven configuration, NearDup emphasizes efficiency, scalability, and ease of use.
+Perceive is a lightweight, customizable tool for comparing image similarity. It is designed to be used both as a command-line interface (CLI) and as a Python library. With support for multiple backbone models (via Torchvision, Hugging Face, or TorchHub) and a YAML-driven configuration, Perceive emphasizes efficiency, scalability, and ease of use.
 
 ## Key Features
 - **Customizable Model Selection:** Define and load any pre-trained model by configuring a YAML file.
 - **Flexible Input Handling:** Compare two images, an image against a folder, or two folders.
-- **Multiple Similarity Metrics:** Compute cosine similarity, SSIM, FSIM, RMSE, and more.
-- **Explainability & Visualization:** Generate heatmaps using Grad-CAM and Grad-CAM++.
+- **Multiple Similarity Metrics:** Compute cosine similarity and more.
 - **Output Options:** Display results on the console or save them as `.npz`/`.pickle` files.
 - **Library & CLI Integration:** Use core functions directly in your Python projects or via a ready-to-use command-line tool.
 
 ## Installation
-NearDup will be distributed via various channels:
+Perceive will be distributed via various channels:
 
 ### Homebrew (Planned)
 ```sh
-brew install NearDup
+brew install Perceive
 ```
 
 ### APT (Planned)
 ```sh
-sudo apt-get install NearDup
+sudo apt-get install Perceive
 ```
 
 ### PyPI
 ```
-pip install neardup
+pip install perceive
 ```
 
 
 ### Manual Installation
 Clone the repository and install dependencies:
 ```sh
-git clone https://github.com/yourrepo/NearDup.git
-cd NearDup
+git clone https://github.com/yourrepo/perceive.git
+cd perceive
 pip install -r requirements.txt
 ```
 
@@ -43,11 +42,11 @@ pip install -r requirements.txt
 ### As a Python Library
 For example, to compare two image folders directly from your code:
 ```python
-import neardup as nd 
+import perceive as pc 
 
 
 # Compare two folders directly
-similarity_matrix = nd.compute_similarity_two_folders(
+similarity_matrix = pc.compute_similarity_two_folders(
     model_name="clip",
     folder1_path="path/to/folder1",
     folder2_path="path/to/folder2",
@@ -57,23 +56,23 @@ print("Folder vs. Folder similarity matrix:", similarity_matrix)
 ```
 
 ### As a CLI Tool
-NearDup also provides a CLI interface. The tool automatically selects the appropriate comparison mode based on the provided arguments.
+Perceive also provides a CLI interface. The tool automatically selects the appropriate comparison mode based on the provided arguments.
 
 #### Examples
 
 - **Basic Image Comparison (Image vs. Image):**
   ```sh
-  python main.py -f image1.jpg image2.jpg -m vit_hf -yp models.yaml
+  perceive -f image1.jpg image2.jpg -m vit_hf -yp models.yaml
   ```
 
 - **Compare an Image Against a Folder (Image vs. Folder):**
   ```sh
-  python main.py -f image.jpg -d folder_path -m resnet -yp models.yaml
+  perceive -f image.jpg -d folder_path -m resnet -yp models.yaml
   ```
 
 - **Compare Two Folders (Folder vs. Folder):**
   ```sh
-  python main.py -d folder1 folder2 -m clip -yp models.yaml -o npz -of results.npz
+  perceive -d folder1 folder2 -m clip -yp models.yaml -o npz -of results.npz
   ```
 
 > **Note:**  
@@ -82,7 +81,7 @@ NearDup also provides a CLI interface. The tool automatically selects the approp
 > - The `-o/--output` option lets you choose to print the results or save them (as `.npz` or `.pickle`).
 
 ## Usage Details
-NearDup’s CLI automatically determines the comparison mode:
+Perceive's CLI automatically determines the comparison mode:
 - **Two image files (-f):** Compares the images directly.
 - **One image file (-f) and one folder (-d):** Compares the image against all images in the folder.
 - **Two folders (-d):** Computes a similarity matrix between images in both folders.
@@ -114,7 +113,7 @@ models:
 - **Simplified file referencing:**  
   Instead of using full paths, if `base_path` is set you can simply reference files relatively:
   ```sh
-  python main.py -f image1.jpg image2.jpg -m vit_hf -yp models.yaml
+  perceive -f image1.jpg image2.jpg -m vit_hf -yp models.yaml
   ```
 
 ## Optimization Opportunities
@@ -140,4 +139,4 @@ models:
 - **Caching:** Store computed embeddings to avoid redundant calculations.
 ---
 
-NearDup is designed to strike a balance between flexibility, usability, and performance. Contributions, feedback, and suggestions are warmly welcomed!
+Perceive is designed to strike a balance between flexibility, usability, and performance. Contributions, feedback, and suggestions are warmly welcomed!
